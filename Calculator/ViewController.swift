@@ -21,7 +21,7 @@ class ViewController: UIViewController
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
         
-        if (isTyping) {
+        if (isTyping && display.text != "0") {
             display.text = display.text! + digit
         } else {
             display.text = digit
@@ -103,6 +103,16 @@ class ViewController: UIViewController
         isTyping = false
         isOperation = false
         operandStack = Array<Double>()
+    }
+    
+    @IBAction func backspace() {
+        var displayTextLength = countElements(display.text!)
+        
+        if (displayTextLength > 1 && display.text! != "0") {
+            display.text = dropLast(display.text!)
+        } else {
+            display.text = "0"
+        }
     }
 }
 
