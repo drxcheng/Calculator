@@ -12,7 +12,10 @@ class ViewController: UIViewController
 {
     @IBOutlet weak var display: UILabel!
     
+    @IBOutlet weak var history: UILabel!
+    
     var isTyping = false
+    var isOperation = false
     var operandStack = Array<Double>()
     
     @IBAction func appendDigit(sender: UIButton) {
@@ -43,9 +46,15 @@ class ViewController: UIViewController
 //    }
     
     @IBAction func enter() {
+        if (!isOperation) {
+            if (history.text?.isEmpty == true) {
+                history.text = display.text!
+            } else {
+                history.text = history.text! + "," + display.text!
+            }
+        }
         isTyping = false
         operandStack.append(displayValue)
-        println("operandStack = \(operandStack)")
     }
     
     var displayValue: Double {
@@ -63,6 +72,7 @@ class ViewController: UIViewController
         if isTyping {
             enter()
         }
+        isOperation = true
         switch operation {
         case "+": performOperation { $0 + $1 }
         case "−": performOperation { $1 - $0 }
@@ -74,6 +84,8 @@ class ViewController: UIViewController
         case "√": performOperation { sqrt($0) }
         default: break
         }
+        history.text = history.text! + "," + operation
+        isOperation = false
     }
     
     func performOperation(operation: (Double, Double) -> Double) {
