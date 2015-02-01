@@ -40,11 +40,6 @@ class ViewController: UIViewController
         }
     }
     
-//    @IBAction func clearDisplay() {
-//        display.text = "0"
-//        isTyping = false
-//    }
-    
     @IBAction func enter() {
         if (!isOperation) {
             if (history.text?.isEmpty == true) {
@@ -100,6 +95,14 @@ class ViewController: UIViewController
             displayValue = operation(operandStack.removeLast())
             enter()
         }
+    }
+    
+    @IBAction func clear() {
+        display.text = "0"
+        history.text = ""
+        isTyping = false
+        isOperation = false
+        operandStack = Array<Double>()
     }
 }
 
