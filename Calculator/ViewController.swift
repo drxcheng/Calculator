@@ -79,7 +79,7 @@ class ViewController: UIViewController
         case "√": performOperation { sqrt($0) }
         default: break
         }
-        history.text = history.text! + "," + operation
+        history.text = history.text! + "," + operation + "," + display.text! + "="
         isOperation = false
     }
     
