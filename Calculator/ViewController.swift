@@ -21,7 +21,7 @@ class ViewController: UIViewController
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
         
-        if (isTyping && display.text != "0") {
+        if isTyping && display.text != "0" {
             display.text = display.text! + digit
         } else {
             display.text = digit
@@ -32,16 +32,16 @@ class ViewController: UIViewController
     @IBAction func addDot() {
         let isInteger = displayValue % 1 == 0
         
-        if (isInteger) {
+        if isInteger {
             display.text = display.text! + "."
-        } else if (!isTyping) {
+        } else if !isTyping {
             display.text = "0."
             isTyping = true
         }
     }
     
     @IBAction func enter() {
-        if (!isOperation) {
+        if !isOperation {
             if (history.text?.isEmpty == true) {
                 history.text = display.text!
             } else {
@@ -50,6 +50,7 @@ class ViewController: UIViewController
         }
         isTyping = false
         operandStack.append(displayValue)
+        println(operandStack)
     }
     
     var displayValue: Double {
@@ -57,7 +58,12 @@ class ViewController: UIViewController
             return NSNumberFormatter().numberFromString(display.text!)!.doubleValue;
         }
         set {
-            display.text = "\(newValue)";
+            if newValue % 1 == 0 {
+                var newText = "\(newValue)"
+                display.text = newText.substringToIndex(advance(newText.startIndex, countElements(newText) - 2))
+            } else {
+                display.text = "\(newValue)";
+            }
             isTyping = false;
         }
     }
@@ -108,11 +114,19 @@ class ViewController: UIViewController
     @IBAction func backspace() {
         var displayTextLength = countElements(display.text!)
         
-        if (displayTextLength > 1 && display.text! != "0") {
+        if displayTextLength > 1 && display.text! != "0" {
             display.text = dropLast(display.text!)
         } else {
             display.text = "0"
         }
+    }
+    
+    @IBAction func sign() {
+//        if isTyping {
+            displayValue = 0 - displayValue
+//        } else {
+//            performOperation { 0 - $0 }
+//        }
     }
 }
 
