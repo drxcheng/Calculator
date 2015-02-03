@@ -30,14 +30,14 @@ class ViewController: UIViewController
     }
 
     @IBAction func addDot() {
-        let isInteger = displayValue % 1 == 0
+        let isInteger = displayValue! % 1 == 0
         
         if isInteger {
             display.text = display.text! + "."
         } else if !isTyping {
             display.text = "0."
-            isTyping = true
         }
+        isTyping = true
     }
     
     @IBAction func enter() {
@@ -49,20 +49,25 @@ class ViewController: UIViewController
             }
         }
         isTyping = false
-        operandStack.append(displayValue)
-        println(operandStack)
+        if displayValue != nil {
+            operandStack.append(displayValue!)
+        }
+//        println(operandStack)
     }
     
-    var displayValue: Double {
+    var displayValue: Double? {
         get {
-            return NSNumberFormatter().numberFromString(display.text!)!.doubleValue;
+            var number = NSNumberFormatter().numberFromString(display.text!);
+            return number == nil ? nil : number!.doubleValue
         }
         set {
-            if newValue % 1 == 0 {
-                var newText = "\(newValue)"
+            if newValue == nil {
+                display.text = "0"
+            } else if newValue! % 1 == 0 {
+                var newText = "\(newValue!)"
                 display.text = newText.substringToIndex(advance(newText.startIndex, countElements(newText) - 2))
             } else {
-                display.text = "\(newValue)";
+                display.text = "\(newValue!)";
             }
             isTyping = false;
         }
@@ -122,11 +127,7 @@ class ViewController: UIViewController
     }
     
     @IBAction func sign() {
-//        if isTyping {
-            displayValue = 0 - displayValue
-//        } else {
-//            performOperation { 0 - $0 }
-//        }
+        displayValue = 0 - displayValue!
     }
 }
 
