@@ -25,22 +25,6 @@ class ViewController: UIViewController
             isTyping = true
         }
     }
-
-    @IBAction func addDot() {
-        let isInteger = displayValue % 1 == 0
-        
-        if (isInteger) {
-            display.text = display.text! + "."
-        } else if (!isTyping) {
-            display.text = "0."
-            isTyping = true
-        }
-    }
-    
-//    @IBAction func clearDisplay() {
-//        display.text = "0"
-//        isTyping = false
-//    }
     
     @IBAction func enter() {
         isTyping = false
@@ -68,9 +52,6 @@ class ViewController: UIViewController
         case "−": performOperation { $1 - $0 }
         case "×": performOperation { $0 * $1 }
         case "÷": performOperation { $1 / $0 }
-        case "sin": performOperation { sin($0) }
-        case "cos": performOperation { cos($0) }
-        case "π": performOperation { M_PI * $0 }
         case "√": performOperation { sqrt($0) }
         default: break
         }
