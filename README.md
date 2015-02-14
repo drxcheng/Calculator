@@ -1,2 +1,2 @@
 # Calculator
-Stanford CS193P 2015 Assignment 1
+Stanford CS193P 2015 Lecture 2
