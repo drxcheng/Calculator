@@ -18,7 +18,7 @@ class CalculatorBrain
         
         var description: String {
             get {
-                switch  self {
+                switch self {
                 case .Operand(let operand):
                     return "\(operand)"
                 case .UnaryOperation(let symbol, _):
@@ -34,7 +34,9 @@ class CalculatorBrain
     
     private var knowOps = [String: Op]()
     
-    private var history = [String]()
+    var variableValues = Dictionary<String, Double>()
+    
+    private var lastOp = Op?()
     
     init()
     {
@@ -54,7 +56,7 @@ class CalculatorBrain
     func clear()
     {
         opStack = [Op]()
-        history = [String]()
+        lastOp = nil
     }
     
     private func evaluate(ops: [Op]) -> (result: Double?, remainingOps: [Op])
@@ -87,7 +89,7 @@ class CalculatorBrain
     func evaluate() -> Double?
     {
         let (result, remainder) = evaluate(opStack)
-        println("\(opStack) = \(result) with \(remainder) left over")
+        println("evaluate: \(opStack) = \(result) with \(remainder) left over")
         
         return result
     }
@@ -95,6 +97,19 @@ class CalculatorBrain
     func pushOperand(operand: Double) -> Double?
     {
         opStack.append(Op.Operand(operand))
+        
+        return evaluate()
+    }
+    
+    func pushOperand(symbol: String) -> Double?
+    {
+        var operand = variableValues[symbol]
+        
+        if operand == nil {
+            return nil
+        }
+        
+        opStack.append(Op.Operand(operand!))
         
         return evaluate()
     }
@@ -108,13 +123,70 @@ class CalculatorBrain
         return evaluate()
     }
     
-    func addHistory(item: String)
-    {
-        history.append(item)
+    var desciption: String {
+        get {
+            return displayHistory()
+        }
     }
     
-    func getHistory() -> String
+    private func displayHistory() -> String
     {
-        return join(",", history)
+        var result : String?;
+        var opsToShow = opStack
+
+        do {
+            let (partialResult, remainingOps, _) = displayHistory(opsToShow)
+        
+            result = result == nil ? "\(partialResult!)" : "\(partialResult!),\(result!)"
+            opsToShow = remainingOps
+        } while (!opsToShow.isEmpty)
+        
+        return result!
+    }
+    
+    private func displayHistory(ops: [Op]) -> (display: String?, remainingOps: [Op], isOperand: Bool)
+    {
+        if ops.isEmpty {
+            return (nil, ops, true)
+        }
+        
+        var remainingOps = ops
+        let op = remainingOps.removeLast()
+        
+        switch op {
+        case .Operand(let operand):
+            let intValue = Int(operand)
+            let doubleValue = Double(intValue)
+            let operandDisplay = operand == doubleValue ? "\(intValue)" : "\(operand)"
+            return (operandDisplay, remainingOps, true)
+        case .UnaryOperation("π", _):
+            return ("π", remainingOps, true)
+        case .UnaryOperation(let symbol, _):
+            let previousResult = displayHistory(remainingOps)
+            let previousResultDisplay = previousResult.display == nil ? "?" : previousResult.display!
+            return ("\(symbol)(\(previousResultDisplay))", previousResult.remainingOps, false)
+        case .BinaryOperation(let symbol, _):
+            let previousResult1 = displayHistory(remainingOps)
+            let previousResult2 = displayHistory(previousResult1.remainingOps)
+            let previousResult2Display = previousResult2.display == nil ? "?" : previousResult2.display!
+            let previousResult1Display = needParentheses(op) && !previousResult1.isOperand ? "(\(previousResult1.display!))" : previousResult1.display!
+            lastOp = op
+            
+            return ("\(previousResult2Display)\(symbol)\(previousResult1Display)", previousResult2.remainingOps, false)
+        }
+    }
+    
+    private func needParentheses(op: Op) -> Bool
+    {
+        if (lastOp == nil) {
+            return false
+        }
+        
+        if ((op.description == "×" || op.description == "÷") &&
+            (lastOp!.description == "+" || lastOp!.description == "−")) {
+            return true
+        }
+        
+        return false
     }
 }

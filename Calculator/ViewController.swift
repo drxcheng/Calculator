@@ -65,9 +65,8 @@ class ViewController: UIViewController
         } else {
             displayValue = 0
         }
-        
-        brain.addHistory(display.text!)
-        history.text = brain.getHistory()
+
+        history.text = brain.desciption
     }
     
     @IBAction func clear()
@@ -106,6 +105,8 @@ class ViewController: UIViewController
                 displayValue = 0
             }
         }
+        
+        history.text = brain.desciption
     }
 }
 
