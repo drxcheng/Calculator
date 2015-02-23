@@ -131,17 +131,17 @@ class CalculatorBrain
     
     private func displayHistory() -> String
     {
-        var result : String?;
+        var result = "";
         var opsToShow = opStack
 
         do {
             let (partialResult, remainingOps, _) = displayHistory(opsToShow)
         
-            result = result == nil ? "\(partialResult!)" : "\(partialResult!),\(result!)"
+            result = result == "" ? "\(partialResult!)" : "\(partialResult!),\(result)"
             opsToShow = remainingOps
         } while (!opsToShow.isEmpty)
-        
-        return result!
+
+        return "\(result)="
     }
     
     private func displayHistory(ops: [Op]) -> (display: String?, remainingOps: [Op], isOperand: Bool)
