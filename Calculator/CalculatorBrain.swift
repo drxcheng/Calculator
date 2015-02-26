@@ -10,9 +10,12 @@ import Foundation
 
 class CalculatorBrain
 {
+    let memoryVariable = "M"
+    
     private enum Op: Printable
     {
         case Operand(Double)
+        case OperandVariable(String)
         case UnaryOperation(String, Double -> Double)
         case BinaryOperation(String, (Double, Double) -> Double)
         
@@ -21,6 +24,8 @@ class CalculatorBrain
                 switch self {
                 case .Operand(let operand):
                     return "\(operand)"
+                case .OperandVariable(let variable):
+                    return "\(variable)"
                 case .UnaryOperation(let symbol, _):
                     return symbol
                 case .BinaryOperation(let symbol, _):
@@ -56,6 +61,7 @@ class CalculatorBrain
     func clear()
     {
         opStack = [Op]()
+        variableValues = Dictionary<String, Double>()
         lastOp = nil
     }
     
@@ -66,6 +72,9 @@ class CalculatorBrain
             let op = remainingOps.removeLast()
             switch op {
             case .Operand(let operand):
+                return (operand, remainingOps)
+            case .OperandVariable(let symbol):
+                let operand = variableValues[symbol]
                 return (operand, remainingOps)
             case .UnaryOperation(_, let operation):
                 let operandEvaluation = evaluate(remainingOps)
@@ -103,13 +112,7 @@ class CalculatorBrain
     
     func pushOperand(symbol: String) -> Double?
     {
-        var operand = variableValues[symbol]
-        
-        if operand == nil {
-            return nil
-        }
-        
-        opStack.append(Op.Operand(operand!))
+        opStack.append(Op.OperandVariable(symbol))
         
         return evaluate()
     }
@@ -159,6 +162,8 @@ class CalculatorBrain
             let doubleValue = Double(intValue)
             let operandDisplay = operand == doubleValue ? "\(intValue)" : "\(operand)"
             return (operandDisplay, remainingOps, true)
+        case .OperandVariable(let symbol):
+            return (symbol, remainingOps, true)
         case .UnaryOperation("π", _):
             return ("π", remainingOps, true)
         case .UnaryOperation(let symbol, _):
@@ -188,5 +193,17 @@ class CalculatorBrain
         }
         
         return false
+    }
+    
+    func saveMemory(displayValue: Double?)
+    {
+        if displayValue != nil {
+            variableValues[memoryVariable] = displayValue!
+        }
+    }
+    
+    func loadMemory()
+    {
+        pushOperand("M")
     }
 }

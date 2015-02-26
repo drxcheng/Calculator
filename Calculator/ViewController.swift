@@ -26,9 +26,11 @@ class ViewController: UIViewController
         }
         set {
             if newValue == nil {
-                display.text = "0"
+                display.text = " "
             } else {
-                display.text = "\(newValue!)"
+                let intValue = Int(newValue!)
+                let doubleValue = Double(intValue)
+                display.text = newValue! == doubleValue ? "\(intValue)" : "\(newValue!)"
             }
         }
     }
@@ -59,19 +61,18 @@ class ViewController: UIViewController
     
     @IBAction func enter()
     {
-        isTyping = false
-        if let result = brain.pushOperand(displayValue!) {
-            displayValue = result
-        } else {
-            displayValue = 0
+        if (displayValue == nil) {
+            return
         }
-
+        
+        isTyping = false
+        displayValue = brain.pushOperand(displayValue!)
         history.text = brain.desciption
     }
     
     @IBAction func clear()
     {
-        display.text = "0"
+        display.text = " "
         history.text = ""
         isTyping = false
         brain.clear()
@@ -99,14 +100,22 @@ class ViewController: UIViewController
             enter()
         }
         if let operation = sender.currentTitle {
-            if let result = brain.performOperation(operation) {
-                displayValue = result
-            } else {
-                displayValue = 0
-            }
+            displayValue = brain.performOperation(operation)
         }
         
         history.text = brain.desciption
+    }
+    
+    @IBAction func saveMemory() {
+        brain.saveMemory(displayValue)
+        isTyping = false
+        displayValue = brain.evaluate()
+    }
+    
+    
+    @IBAction func loadMemory() {
+        enter()
+        brain.loadMemory()
     }
 }
 
